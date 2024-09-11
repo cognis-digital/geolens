@@ -41,3 +41,4 @@
 2024-07-14T19:59:49  refactor: I have altered the code. pray I don't alter it further
 2024-07-28T14:16:56  ci(output): dedupe overlapping findings
 2024-08-28T09:33:03  fix: works on my machine (TM)
+2024-09-11T16:50:10  perf(rules): normalize unicode before matching
