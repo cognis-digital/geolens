@@ -46,3 +46,4 @@
 2024-10-07T18:24:24  ci(tests): clarify the README quickstart
 2024-11-08T13:41:31  docs(core): respect .gitignore when walking
 2024-11-22T08:58:38  refactor(engine): cover the multiline case
+2024-12-06T15:15:45  test(config): add a dry-run flag
