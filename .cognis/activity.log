@@ -50,3 +50,4 @@
 2025-01-06T10:32:52  docs: standing on the shoulders of giants (garak, sigma, trufflehog)
 2025-01-19T17:49:59  chore(parser): wire the MCP tool schema
 2025-02-02T12:06:06  fix: handle empty input gracefully
+2025-02-15T19:23:13  perf(ci): handle empty and malformed input
