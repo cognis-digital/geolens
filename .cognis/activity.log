@@ -52,3 +52,4 @@
 2025-02-02T12:06:06  fix: handle empty input gracefully
 2025-02-15T19:23:13  perf(ci): handle empty and malformed input
 2025-03-19T14:40:20  style(scan): respect .gitignore when walking
+2025-04-01T09:57:27  chore(io): lower memory on big inputs
