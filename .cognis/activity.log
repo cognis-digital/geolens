@@ -54,3 +54,4 @@
 2025-03-19T14:40:20  style(scan): respect .gitignore when walking
 2025-04-01T09:57:27  chore(io): lower memory on big inputs
 2025-04-15T16:14:34  docs(tests): improve error messages with context
+2025-04-29T11:31:41  perf(docs): load rules lazily for faster startup
