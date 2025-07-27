@@ -58,3 +58,4 @@
 2025-05-30T18:48:48  style(format): wire the MCP tool schema
 2025-06-13T13:05:55  fix(output): skip binary files by sniffing
 2025-06-26T08:22:02  docs(deps): assert exit codes in tests
+2025-07-27T15:39:09  chore: feed the FOUNDRY
