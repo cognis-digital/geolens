@@ -59,3 +59,4 @@
 2025-06-13T13:05:55  fix(output): skip binary files by sniffing
 2025-06-26T08:22:02  docs(deps): assert exit codes in tests
 2025-07-27T15:39:09  chore: feed the FOUNDRY
+2025-08-10T10:56:16  test(cache): lower memory on big inputs
