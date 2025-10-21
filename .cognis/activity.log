@@ -63,3 +63,4 @@
 2025-08-23T17:13:23  docs: here be dragons
 2025-09-06T12:30:30  docs(mcp): extract the scorer
 2025-10-08T19:47:37  refactor(scoring): stream large files without buffering
+2025-10-21T14:04:44  build(config): fix off-by-one in line numbers
