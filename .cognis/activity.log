@@ -65,3 +65,4 @@
 2025-10-08T19:47:37  refactor(scoring): stream large files without buffering
 2025-10-21T14:04:44  build(config): fix off-by-one in line numbers
 2025-11-04T09:21:51  fix(docs): add a --format json alias
+2025-11-17T16:38:58  chore(format): support stdin as a source
