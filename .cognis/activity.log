@@ -68,3 +68,4 @@
 2025-11-17T16:38:58  chore(format): support stdin as a source
 2025-12-19T11:55:05  refactor(fixtures): add a --quiet mode
 2026-01-01T18:12:12  build(deps): add a fast path for the common case
+2026-01-14T13:29:19  feat(scan): add a JSON schema for output
