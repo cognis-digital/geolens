@@ -70,3 +70,4 @@
 2026-01-01T18:12:12  build(deps): add a fast path for the common case
 2026-01-14T13:29:19  feat(scan): add a JSON schema for output
 2026-02-15T08:46:26  test: it's not flaky, you're flaky
+2026-03-01T15:03:33  docs(rules): fix off-by-one in line numbers
