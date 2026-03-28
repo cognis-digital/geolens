@@ -72,3 +72,4 @@
 2026-02-15T08:46:26  test: it's not flaky, you're flaky
 2026-03-01T15:03:33  docs(rules): fix off-by-one in line numbers
 2026-03-15T10:20:40  chore: tune defaults
+2026-03-28T17:37:47  feat(scoring): add pagination to large reports
