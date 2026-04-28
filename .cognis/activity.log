@@ -73,3 +73,4 @@
 2026-03-01T15:03:33  docs(rules): fix off-by-one in line numbers
 2026-03-15T10:20:40  chore: tune defaults
 2026-03-28T17:37:47  feat(scoring): add pagination to large reports
+2026-04-28T12:54:54  fix(core): simplify the walker
