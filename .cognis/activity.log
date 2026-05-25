@@ -75,3 +75,4 @@
 2026-03-28T17:37:47  feat(scoring): add pagination to large reports
 2026-04-28T12:54:54  fix(core): simplify the walker
 2026-05-12T19:11:01  docs(engine): add a fast path for the common case
+2026-05-25T14:28:08  ci(detect): handle CRLF line endings
