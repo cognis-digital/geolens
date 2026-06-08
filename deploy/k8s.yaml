@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: geolens, labels: { app: geolens } }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: geolens } }
+  template:
+    metadata: { labels: { app: geolens } }
+    spec:
+      containers:
+        - name: geolens
+          image: ghcr.io/cognis-digital/geolens:latest
+          ports: [{ containerPort: 8000 }]
+          resources:
+            requests: { cpu: "50m", memory: "64Mi" }
+            limits: { cpu: "500m", memory: "256Mi" }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: geolens }
+spec:
+  selector: { app: geolens }
+  ports: [{ port: 80, targetPort: 8000 }]
