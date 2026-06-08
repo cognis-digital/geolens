@@ -1,0 +1,1 @@
+Drop .jpg/.heic photos in this folder. GEOLENS will report which contain GPS metadata.
