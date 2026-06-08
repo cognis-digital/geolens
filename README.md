@@ -36,7 +36,13 @@ Image geolocation toolkit — EXIF, sun-shadow, OCR, reverse-search — without 
 <a name="features"></a>
 ## Features
 
-- ✅ Scan
+- ✅ Extract Exif
+- ✅ Gps From Exif
+- ✅ Sun Position
+- ✅ Shadow Bearing To Azimuth
+- ✅ Estimate Latitude From Shadow
+- ✅ Reverse Search Urls
+- ✅ Analyze Image
 - ✅ Runs on Linux/macOS/Windows · Docker · devcontainer
 - ✅ Ports in Python, JavaScript, Go, and Rust (`ports/`)
 
