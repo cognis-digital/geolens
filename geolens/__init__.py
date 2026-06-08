@@ -1,11 +1,30 @@
-"""
-GEOLENS — Image geolocation toolkit — EXIF, sun-shadow, OCR, reverse-search
-Part of the Cognis Neural Suite by Cognis Digital.
-https://cognis.digital · MIT License
-"""
-from geolens.core import scan, TOOL_NAME, TOOL_VERSION
+"""GEOLENS — image geolocation toolkit (stdlib only).
 
-__version__ = TOOL_VERSION
-__author__ = "Cognis Digital"
-__license__ = "MIT"
-__all__ = ["scan", "TOOL_NAME", "TOOL_VERSION", "__version__"]
+EXIF GPS extraction, sun-position / shadow geolocation math, OCR-target
+preprocessing hints, and reverse-search query generation. No network, no
+third-party dependencies.
+"""
+from .core import (
+    extract_exif,
+    gps_from_exif,
+    sun_position,
+    shadow_bearing_to_azimuth,
+    estimate_latitude_from_shadow,
+    reverse_search_urls,
+    analyze_image,
+)
+
+TOOL_NAME = "geolens"
+TOOL_VERSION = "1.0.0"
+
+__all__ = [
+    "extract_exif",
+    "gps_from_exif",
+    "sun_position",
+    "shadow_bearing_to_azimuth",
+    "estimate_latitude_from_shadow",
+    "reverse_search_urls",
+    "analyze_image",
+    "TOOL_NAME",
+    "TOOL_VERSION",
+]
