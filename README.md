@@ -16,7 +16,7 @@
 </div>
 
 ```bash
-pip install cognis-geolens
+pip install "git+https://github.com/cognis-digital/geolens.git"
 geolens scan .            # → prioritized findings in seconds
 ```
 
@@ -52,7 +52,7 @@ Image geolocation toolkit — EXIF, sun-shadow, OCR, reverse-search — without 
 ## Quick start
 
 ```bash
-pip install cognis-geolens
+pip install "git+https://github.com/cognis-digital/geolens.git"
 geolens --version
 geolens scan .                       # scan current project
 geolens scan . --format json         # machine-readable
