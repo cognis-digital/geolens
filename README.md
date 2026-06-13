@@ -20,6 +20,34 @@ pip install cognis-geolens
 geolens scan .            # → prioritized findings in seconds
 ```
 
+
+## Usage — step by step
+
+1. Install (Python 3.9+):
+   ```bash
+   pip install geolens
+   ```
+2. Extract EXIF/GPS and reverse-search hints from a JPEG:
+   ```bash
+   geolens exif photo.jpg --url https://example.com/photo.jpg
+   ```
+3. Cross-check the scene geometry: compute the sun's azimuth/elevation for a
+   candidate location and time, or estimate latitude from a shadow:
+   ```bash
+   geolens sun --lat 38.89 --lon -77.03 --when 2026-06-21T17:00:00Z
+   geolens shadow --height 2.0 --shadow 1.4 --when 2026-06-21T17:00:00Z
+   ```
+4. Build reverse-image / keyword search URLs to chase the source:
+   ```bash
+   geolens reverse --url https://example.com/photo.jpg --keyword "harbor" --keyword "crane"
+   ```
+5. Read the output: tables print flattened `key  value` rows; add `--format
+   json` (a top-level flag) for piping. `geolens exif` exits `2` when the image
+   has no EXIF, which lets you branch in a script:
+   ```bash
+   geolens --format json exif photo.jpg > exif.json || echo "no EXIF present"
+   ```
+
 ## Contents
 
 - [Why geolens?](#why) · [Features](#features) · [Quick start](#quick-start) · [Example](#example) · [Architecture](#architecture) · [AI stack](#ai-stack) · [How it compares](#how-it-compares) · [Integrations](#integrations) · [Install anywhere](#install-anywhere) · [Related](#related) · [Contributing](#contributing)
