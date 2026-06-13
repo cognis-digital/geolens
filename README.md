@@ -20,6 +20,12 @@ pip install "git+https://github.com/cognis-digital/geolens.git"
 geolens scan .            # → prioritized findings in seconds
 ```
 
+<!-- cognis:layman:start -->
+## What is this?
+
+GEOLENS is a command-line tool that helps you figure out where a photo was taken. It reads hidden location data embedded in image files, calculates the sun's position from shadows to estimate a photographer's latitude, and generates reverse-image-search links so you can cross-check results on Google, Yandex, Bing, and TinEye. It is useful for journalists, researchers, and investigators who need to verify where an image originated without uploading it to any external service.
+<!-- cognis:layman:end -->
+
 ## Contents
 
 - [Why geolens?](#why) · [Features](#features) · [Quick start](#quick-start) · [Example](#example) · [Architecture](#architecture) · [AI stack](#ai-stack) · [How it compares](#how-it-compares) · [Integrations](#integrations) · [Install anywhere](#install-anywhere) · [Related](#related) · [Contributing](#contributing)
@@ -49,6 +55,42 @@ Image geolocation toolkit — EXIF, sun-shadow, OCR, reverse-search — without 
 <div align="right"><a href="#top">↑ back to top</a></div>
 
 <a name="quick-start"></a>
+<!-- cognis:install:start -->
+## Install
+
+`geolens` is source-available (not published to PyPI) — every method below installs
+straight from GitHub. Pick whichever you prefer; the one-line scripts auto-detect
+the best tool available on your machine.
+
+**One-liner (Linux / macOS):**
+```sh
+curl -fsSL https://raw.githubusercontent.com/cognis-digital/geolens/HEAD/install.sh | sh
+```
+
+**One-liner (Windows PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/cognis-digital/geolens/HEAD/install.ps1 | iex
+```
+
+**Or install manually — any one of:**
+```sh
+pipx install "git+https://github.com/cognis-digital/geolens.git"     # isolated (recommended)
+uv tool install "git+https://github.com/cognis-digital/geolens.git"  # uv
+pip install "git+https://github.com/cognis-digital/geolens.git"      # pip
+```
+
+**From source:**
+```sh
+git clone https://github.com/cognis-digital/geolens.git
+cd geolens && pip install .
+```
+
+Then run:
+```sh
+geolens --help
+```
+<!-- cognis:install:end -->
+
 ## Quick start
 
 ```bash
