@@ -15,7 +15,7 @@ previews the exact request without sending:
 
 ```bash
 geolens ... --format json | cognis-connect emit --to stix   # STIX 2.1 bundle
-geolens ... --format json | cognis-connect emit --to slack   # Slack --url $URL --token $TOK
+geolens ... --format json | cognis-connect emit --to slack --url $URL --token $TOK   # Slack
 geolens ... --format json | cognis-connect emit --to brief   # analyst brief via your /v1 fleet
 ```
 
