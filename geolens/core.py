@@ -91,19 +91,28 @@ def _read_value(buf: bytes, endian: str, ftype: int, count: int, voff: int):
     code, size = _TYPE_SIZES.get(ftype, ("B", 1))
     total = size * count
     raw = buf[voff : voff + total]
+    # Guard against truncated/corrupt EXIF blobs — return a safe sentinel.
+    if len(raw) < total:
+        return None
     if ftype == 2:  # ASCII
         return raw.split(b"\x00", 1)[0].decode("latin-1", "replace")
     if ftype in (5, 10):  # rationals
         vals = []
         for k in range(count):
+            chunk = raw[k * 8 : k * 8 + 8]
+            if len(chunk) < 8:
+                return None
             a, b = struct.unpack(
                 endian + ("II" if ftype == 5 else "ii"),
-                raw[k * 8 : k * 8 + 8],
+                chunk,
             )
             vals.append((a, b))
         return vals[0] if count == 1 else vals
     fmt = endian + {1: "B", 3: "H", 4: "I", 7: "B", 9: "i"}.get(ftype, "B") * count
-    vals = list(struct.unpack(fmt, raw))
+    try:
+        vals = list(struct.unpack(fmt, raw))
+    except struct.error:
+        return None
     return vals[0] if count == 1 else vals
 
 
@@ -132,8 +141,15 @@ def _parse_ifd(buf: bytes, endian: str, offset: int) -> Tuple[Dict[int, Any], Li
 
 def extract_exif(image_bytes: bytes) -> Dict[str, Any]:
     """Return a dict of decoded EXIF/GPS tags, or ``{}`` if none present."""
-    seg = _find_exif_segment(image_bytes)
+    if not image_bytes:
+        return {}
+    try:
+        seg = _find_exif_segment(image_bytes)
+    except Exception:
+        return {}
     if seg is None:
+        return {}
+    if len(seg) < 8:
         return {}
     bo = seg[:2]
     if bo == b"II":
@@ -142,7 +158,10 @@ def extract_exif(image_bytes: bytes) -> Dict[str, Any]:
         endian = ">"
     else:
         return {}
-    (ifd0_off,) = struct.unpack(endian + "I", seg[4:8])
+    try:
+        (ifd0_off,) = struct.unpack(endian + "I", seg[4:8])
+    except struct.error:
+        return {}
     ifd0, _ = _parse_ifd(seg, endian, ifd0_off)
 
     out: Dict[str, Any] = {}
@@ -179,12 +198,24 @@ def gps_from_exif(exif: Dict[str, Any]) -> Optional[Dict[str, float]]:
         return None
     if "GPSLatitude" not in gps or "GPSLongitude" not in gps:
         return None
-    lat = _dms_to_deg(gps["GPSLatitude"], gps.get("GPSLatitudeRef", "N"))
-    lon = _dms_to_deg(gps["GPSLongitude"], gps.get("GPSLongitudeRef", "E"))
+    # Guard against malformed/truncated DMS tuples (e.g. None from corrupt EXIF).
+    lat_dms = gps["GPSLatitude"]
+    lon_dms = gps["GPSLongitude"]
+    if lat_dms is None or lon_dms is None:
+        return None
+    if not (isinstance(lat_dms, (list, tuple)) and len(lat_dms) >= 3):
+        return None
+    if not (isinstance(lon_dms, (list, tuple)) and len(lon_dms) >= 3):
+        return None
+    try:
+        lat = _dms_to_deg(lat_dms, gps.get("GPSLatitudeRef", "N"))
+        lon = _dms_to_deg(lon_dms, gps.get("GPSLongitudeRef", "E"))
+    except (TypeError, IndexError, ZeroDivisionError):
+        return None
     result = {"latitude": round(lat, 6), "longitude": round(lon, 6)}
     if "GPSAltitude" in gps:
         a = gps["GPSAltitude"]
-        if isinstance(a, tuple) and a[1]:
+        if isinstance(a, tuple) and len(a) >= 2 and a[1]:
             alt = a[0] / a[1]
             if gps.get("GPSAltitudeRef") in (1, b"\x01"):
                 alt = -alt
@@ -355,8 +386,10 @@ def reverse_search_urls(image_url: Optional[str] = None,
         urls["yandex"] = f"https://yandex.com/images/search?rpt=imageview&url={u}"
         urls["bing"] = f"https://www.bing.com/images/search?q=imgurl:{u}&view=detailv2&iss=sbi"
         urls["tineye"] = f"https://tineye.com/search?url={u}"
-    if keywords:
-        kw = quote_plus(" ".join(keywords))
+    # Filter out blank/whitespace-only keywords before joining.
+    clean_kw = [k for k in (keywords or []) if k and k.strip()]
+    if clean_kw:
+        kw = quote_plus(" ".join(clean_kw))
         urls["google_text"] = f"https://www.google.com/search?q={kw}"
         urls["openstreetmap"] = f"https://www.openstreetmap.org/search?query={kw}"
     return urls

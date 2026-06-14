@@ -45,6 +45,8 @@ def _emit(data: Any, fmt: str) -> None:
         return rows
 
     rows = walk(data)
+    if not rows:
+        return
     width = max((len(r.split(" = ")[0]) for r in rows), default=0)
     for r in rows:
         if " = " in r:
@@ -55,14 +57,38 @@ def _emit(data: Any, fmt: str) -> None:
 
 
 def _cmd_exif(args) -> int:
-    with open(args.image, "rb") as fh:
-        data = fh.read()
+    path = args.image
+    if not path:
+        print("error: image path is required", file=sys.stderr)
+        return 2
+    try:
+        with open(path, "rb") as fh:
+            data = fh.read()
+    except IsADirectoryError:
+        print(f"error: '{path}' is a directory, not a file", file=sys.stderr)
+        return 2
+    except PermissionError as e:
+        print(f"error: {e}", file=sys.stderr)
+        return 2
+    if not data:
+        print(f"error: '{path}' is empty", file=sys.stderr)
+        return 2
+    if not data.startswith(b"\xff\xd8"):
+        print(f"error: '{path}' does not appear to be a JPEG (wrong magic bytes)",
+              file=sys.stderr)
+        return 2
     result = analyze_image(data, image_url=args.url)
     _emit(result, args.format)
     return 0 if result["has_exif"] else 2
 
 
 def _cmd_sun(args) -> int:
+    if not (-90.0 <= args.lat <= 90.0):
+        print(f"error: --lat must be in [-90, 90], got {args.lat}", file=sys.stderr)
+        return 2
+    if not (-180.0 <= args.lon <= 180.0):
+        print(f"error: --lon must be in [-180, 180], got {args.lon}", file=sys.stderr)
+        return 2
     when = _parse_when(args.when)
     result = sun_position(args.lat, args.lon, when)
     result["utc"] = when.astimezone(_dt.timezone.utc).isoformat()
@@ -128,10 +154,16 @@ def main(argv: Optional[List[str]] = None) -> int:
     try:
         return args.func(args)
     except FileNotFoundError as e:
-        print(f"error: {e}", file=sys.stderr)
-        return 1
+        print(f"error: file not found — {e}", file=sys.stderr)
+        return 2
     except (ValueError, OSError) as e:
         print(f"error: {e}", file=sys.stderr)
+        return 1
+    except KeyboardInterrupt:
+        print("", file=sys.stderr)
+        return 130
+    except Exception as e:  # noqa: BLE001
+        print(f"error: unexpected failure — {e}", file=sys.stderr)
         return 1
 
 
