@@ -58,7 +58,11 @@ def _cmd_exif(args) -> int:
     with open(args.image, "rb") as fh:
         data = fh.read()
     result = analyze_image(data, image_url=args.url)
-    _emit(result, args.format)
+    if args.format in ("geojson", "stix"):
+        from . import intel
+        print(intel.export(result, args.format))
+    else:
+        _emit(result, args.format)
     return 0 if result["has_exif"] else 2
 
 
@@ -93,7 +97,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument("--version", action="version",
                    version=f"{TOOL_NAME} {TOOL_VERSION}")
-    p.add_argument("--format", choices=["table", "json"], default="table",
+    p.add_argument("--format", choices=["table", "json", "geojson", "stix"], default="table",
                    help="output format (default: table)")
     sub = p.add_subparsers(dest="command", required=True)
 

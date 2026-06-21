@@ -47,6 +47,15 @@ geolens scan .            # → prioritized findings in seconds
    ```bash
    geolens --format json exif photo.jpg > exif.json || echo "no EXIF present"
    ```
+6. Export the geolocation for maps / threat-intel platforms — native, zero-dep
+   (note `--format` is a top-level flag, before the subcommand):
+   ```bash
+   geolens --format geojson exif photo.jpg > fix.geojson   # Leaflet/Mapbox/QGIS/kepler
+   geolens --format stix    exif photo.jpg > fix.json       # STIX 2.1 location bundle for OpenCTI/TIPs
+   ```
+   GeoJSON emits the recovered GPS fix as a point (camera make/model + OSM link as
+   properties); STIX wraps a `location` + `observed-data` + `note` in a `report`.
+   Try it on the bundled sample: `demos/01-basic/sample_geotagged.jpg`.
 
 ## Contents
 

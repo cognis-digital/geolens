@@ -7,5 +7,11 @@ try:
     from geolens.core import TOOL_NAME, TOOL_VERSION
 except Exception:  # pragma: no cover
     TOOL_NAME = "geolens"
-    TOOL_VERSION = "0.1.0"
+    TOOL_VERSION = "0.2.0"
 __version__ = TOOL_VERSION
+
+try:  # native, zero-dep intel export (GeoJSON / STIX 2.1)
+    from geolens import intel  # noqa: F401
+    from geolens.intel import to_geojson, to_stix, export  # noqa: F401
+except Exception:  # pragma: no cover
+    pass
