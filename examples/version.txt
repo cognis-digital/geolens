@@ -1,0 +1,3 @@
+$ geolens-emit --version
+
+geolens 0.2.0

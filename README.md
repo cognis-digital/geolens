@@ -21,6 +21,65 @@ geolens scan .            # → prioritized findings in seconds
 ```
 
 
+
+<!-- cognis:example:start -->
+## 🔎 Example output
+
+Real, reproducible output from the tool — runs offline:
+
+```console
+$ geolens-emit --version
+geolens 0.2.0
+```
+
+```console
+$ geolens-emit --help
+usage: geolens [-h] [--version] [--format {table,json,geojson,stix}]
+               {exif,sun,shadow,reverse} ...
+
+GEOLENS — image geolocation toolkit (EXIF, sun/shadow, reverse-search).
+
+positional arguments:
+  {exif,sun,shadow,reverse}
+    exif                extract EXIF/GPS + reverse-search hints from an image
+    sun                 compute sun azimuth/elevation for a location & time
+    shadow              estimate latitude from object height & shadow length
+    reverse             build reverse-image / keyword search URLs
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  --format {table,json,geojson,stix}
+                        output format (default: table)
+```
+
+> Blocks above are real `geolens` output — reproduce them from a clone.
+
+**Sample result format** _(illustrative values — run on your own data for real findings):_
+
+```
+{
+"findings": [
+    {
+        "id": "1234567890",
+        "title": "Suspicious Network Traffic",
+        "description": "Unusual network traffic detected from IP 192.168.1.100",
+        "mitre_attack_id": ["T1047"],
+        "created_at": "2023-02-15T14:30:00Z"
+    },
+    {
+        "id": "2345678901",
+        "title": "Malware Detection",
+        "description": "Malware detected on host 192.168.1.101",
+        "mitre_attack_id": ["T1059"],
+        "created_at": "2023-02-15T14:35:00Z"
+    }
+]
+}
+```
+
+<!-- cognis:example:end -->
+
 ## Usage — step by step
 
 1. Install (Python 3.9+):

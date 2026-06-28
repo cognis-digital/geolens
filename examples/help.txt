@@ -1,0 +1,19 @@
+$ geolens-emit --help
+
+usage: geolens [-h] [--version] [--format {table,json,geojson,stix}]
+               {exif,sun,shadow,reverse} ...
+
+GEOLENS — image geolocation toolkit (EXIF, sun/shadow, reverse-search).
+
+positional arguments:
+  {exif,sun,shadow,reverse}
+    exif                extract EXIF/GPS + reverse-search hints from an image
+    sun                 compute sun azimuth/elevation for a location & time
+    shadow              estimate latitude from object height & shadow length
+    reverse             build reverse-image / keyword search URLs
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  --format {table,json,geojson,stix}
+                        output format (default: table)
