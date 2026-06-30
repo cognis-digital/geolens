@@ -118,7 +118,7 @@ options:
 
 ## Contents
 
-- [Why geolens?](#why) · [Features](#features) · [Quick start](#quick-start) · [Example](#example) · [Architecture](#architecture) · [AI stack](#ai-stack) · [How it compares](#how-it-compares) · [Integrations](#integrations) · [Install anywhere](#install-anywhere) · [Related](#related) · [Contributing](#contributing)
+- [Why geolens?](#why) · [Features](#features) · [Quick start](#quick-start) · [Example](#example) · [Architecture](#architecture) · [Demos](#demos) · [AI stack](#ai-stack) · [How it compares](#how-it-compares) · [Integrations](#integrations) · [Install anywhere](#install-anywhere) · [Related](#related) · [Contributing](#contributing)
 
 <a name="why"></a>
 ## Why geolens?
@@ -178,6 +178,41 @@ flowchart LR
   IN[image / coordinates] --> P[geolens<br/>extract + geolocate]
   P --> OUT[location estimate]
 ```
+
+<div align="right"><a href="#top">↑ back to top</a></div>
+
+<a name="demos"></a>
+## Demos
+
+Five runnable, **offline** scenarios in [`demos/`](demos/) — each for a
+different audience and built on the real `geolens` API (no fabricated output).
+Every scenario reads a bundled sample image or synthesizes real EXIF bytes in
+memory, then prints narrated results and exits 0.
+
+```bash
+# Windows: set PYTHONUTF8=1 first (cp1252 console)
+python demos/run_all.py                       # all five, end to end
+python demos/02_journalist_verification.py    # or just one
+```
+
+| # | Scenario | Audience | What it shows |
+|---|----------|----------|---------------|
+| 1 | [`01_osint_exif_triage.py`](demos/01_osint_exif_triage.py) | OSINT analysts | EXIF/GPS off the bytes + map link + reverse-image search leads |
+| 2 | [`02_journalist_verification.py`](demos/02_journalist_verification.py) | Journalists / verification | Test a "place & time" claim against the real solar azimuth/elevation |
+| 3 | [`03_le_batch_triage.py`](demos/03_le_batch_triage.py) | Law enforcement / IR | Mixed seized folder: who is geotagged vs scrubbed, + a STIX bundle |
+| 4 | [`04_researcher_shadow_geolocation.py`](demos/04_researcher_shadow_geolocation.py) | Researchers | Recover latitude from a stick and its shadow (the "shadow stick") |
+| 5 | [`05_geojson_stix_export.py`](demos/05_geojson_stix_export.py) | Platform / SOC engineers | One fix → GeoJSON (maps) + STIX 2.1 (TIP), graceful with no GPS |
+
+```mermaid
+flowchart LR
+  img[JPEG bytes] --> exif[EXIF / GPS parser]
+  coords[lat / lon / time] --> sun[solar position]
+  obs[height + shadow] --> shadow[shadow geolocation]
+  exif --> out[analyze_image]
+  out --> fmt[table · json · GeoJSON · STIX 2.1]
+```
+
+Full writeup: [`docs/DEMOS.md`](docs/DEMOS.md) · architecture: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 <div align="right"><a href="#top">↑ back to top</a></div>
 
