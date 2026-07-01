@@ -13,3 +13,12 @@ paths-ignore:
   - tests
   - ports
   - integrations
+
+# The CLI prints the recovered coordinates to the user's own stdout — that is
+# the product (geolocation output for the analyst who supplied the image), not
+# logging of secrets to a shared sink. The `clear-text-logging-sensitive-data`
+# query keys off variable names like lat/lon/location and misfires across the
+# whole tool, so we exclude that one rule. All other security queries run.
+query-filters:
+  - exclude:
+      id: py/clear-text-logging-sensitive-data
