@@ -1,13 +1,13 @@
 # Demos
 
-Twenty runnable scenarios in [`../demos/`](../demos/), each targeting a
+Twenty-one runnable scenarios in [`../demos/`](../demos/), each targeting a
 different audience or failure mode. Every scenario is **offline**: it reads a
 bundled sample image or synthesizes real EXIF bytes in memory, then exercises
 the real `geolens` API — no network, no fabricated output. Each returns 0.
 
 ```bash
 # Windows consoles: set PYTHONUTF8=1 first (cp1252 console)
-python demos/run_all.py                          # all twenty, end to end
+python demos/run_all.py                          # all twenty-one, end to end
 python demos/02_journalist_verification.py       # or just one
 ```
 
@@ -32,7 +32,8 @@ python demos/02_journalist_verification.py       # or just one
 | 17 | `17_altitude_sign.py` | Mapping | Above vs below sea level: the GPS altitude-reference byte signs the metres correctly |
 | 18 | `18_seized_folder_report.py` | Law enforcement / IR | A printable triage summary: counts (geotagged/scrubbed/EXIF-no-GPS) and distinct cameras |
 | 19 | `19_solar_noon_verification.py` | Researchers | Round-trip proof: latitude → its solar-noon shadow → recovered latitude matches |
-| 20 | `20_export_format_gallery.py` | Everyone | One fix rendered through every output surface (table, GeoJSON, STIX) side by side |
+| 20 | `20_export_format_gallery.py` | Everyone | One fix rendered through every output surface (table, GeoJSON, STIX, KML) side by side |
+| 21 | `21_kml_google_earth.py` | Mapping | Export a fix as KML (Placemark + altitude) for Google Earth / QGIS / Maps; graceful empty document with no GPS |
 
 ## 1. OSINT EXIF triage — *where, with what, where next*
 **Audience:** OSINT analysts.

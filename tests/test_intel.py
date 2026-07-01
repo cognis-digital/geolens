@@ -61,4 +61,4 @@ def test_export_dispatch_and_error():
     assert json.loads(intel.export(_WITH_GPS, "geojson"))["type"] == "FeatureCollection"
     assert json.loads(intel.export(_WITH_GPS, "stix"))["type"] == "bundle"
     with pytest.raises(ValueError):
-        intel.export(_WITH_GPS, "kml")
+        intel.export(_WITH_GPS, "gpx")

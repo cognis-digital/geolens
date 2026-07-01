@@ -60,6 +60,11 @@ class TestExifCommand(unittest.TestCase):
         self.assertEqual(rc, 0)
         self.assertEqual(json.loads(out)["type"], "bundle")
 
+    def test_kml_format(self):
+        rc, out, _ = _run(["--format", "kml", "exif", GEOTAGGED])
+        self.assertEqual(rc, 0)
+        self.assertIn("<kml", out)
+
     def test_table_format_default(self):
         rc, out, _ = _run(["exif", GEOTAGGED])
         self.assertEqual(rc, 0)

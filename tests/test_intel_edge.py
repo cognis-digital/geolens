@@ -126,7 +126,7 @@ def test_export_case_insensitive():
 
 def test_export_unknown_format_raises():
     with pytest.raises(ValueError):
-        intel.export(WITH_ALT_M, "kml")
+        intel.export(WITH_ALT_M, "gpx")
 
 
 def test_export_unknown_format_lists_options():

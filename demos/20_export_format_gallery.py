@@ -37,7 +37,13 @@ def main() -> None:
     print(f"     {stix['type']} with {len(stix['objects'])} objects: "
           f"{sorted({o['type'] for o in stix['objects']})}")
 
-    print("\n4) GRACEFUL EMPTY (scrubbed image) — both formats still valid:")
+    print("\n4) KML (Google Earth / QGIS):")
+    kml = intel.export(r, "kml")
+    from xml.dom import minidom
+    coord = minidom.parseString(kml).getElementsByTagName("coordinates")[0].firstChild.data
+    print(f"     well-formed KML, Placemark coordinates {coord}  [lon,lat,alt]")
+
+    print("\n5) GRACEFUL EMPTY (scrubbed image) — all formats still valid:")
     empty = analyze_image(b"\xff\xd8\xff\xd9")
     egj = json.loads(intel.export(empty, "geojson"))
     estix = json.loads(intel.export(empty, "stix"))

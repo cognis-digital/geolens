@@ -33,6 +33,7 @@ SCENARIOS = [
     "18_seized_folder_report",
     "19_solar_noon_verification",
     "20_export_format_gallery",
+    "21_kml_google_earth",
 ]
 
 
