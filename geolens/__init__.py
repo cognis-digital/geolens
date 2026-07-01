@@ -10,8 +10,8 @@ except Exception:  # pragma: no cover
     TOOL_VERSION = "0.2.0"
 __version__ = TOOL_VERSION
 
-try:  # native, zero-dep intel export (GeoJSON / STIX 2.1)
+try:  # native, zero-dep intel export (GeoJSON / STIX 2.1 / KML)
     from geolens import intel  # noqa: F401
-    from geolens.intel import to_geojson, to_stix, export  # noqa: F401
+    from geolens.intel import to_geojson, to_stix, to_kml, export  # noqa: F401
 except Exception:  # pragma: no cover
     pass

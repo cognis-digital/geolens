@@ -43,7 +43,7 @@ geolens 0.2.0
 
 ```console
 $ geolens-emit --help
-usage: geolens [-h] [--version] [--format {table,json,geojson,stix}]
+usage: geolens [-h] [--version] [--format {table,json,geojson,stix,kml}]
                {exif,sun,shadow,reverse} ...
 
 GEOLENS — image geolocation toolkit (EXIF, sun/shadow, reverse-search).
@@ -58,7 +58,7 @@ positional arguments:
 options:
   -h, --help            show this help message and exit
   --version             show program's version number and exit
-  --format {table,json,geojson,stix}
+  --format {table,json,geojson,stix,kml}
                         output format (default: table)
 ```
 
@@ -120,9 +120,11 @@ options:
    ```bash
    geolens --format geojson exif photo.jpg > fix.geojson   # Leaflet/Mapbox/QGIS/kepler
    geolens --format stix    exif photo.jpg > fix.json       # STIX 2.1 location bundle for OpenCTI/TIPs
+   geolens --format kml     exif photo.jpg > fix.kml        # Google Earth / QGIS / Google Maps
    ```
    GeoJSON emits the recovered GPS fix as a point (camera make/model + OSM link as
-   properties); STIX wraps a `location` + `observed-data` + `note` in a `report`.
+   properties); STIX wraps a `location` + `observed-data` + `note` in a `report`;
+   KML emits a `Placemark` (with altitude) that Google Earth opens natively.
    Try it on the bundled sample: `demos/01-basic/sample_geotagged.jpg`.
 
 ## Contents
@@ -218,7 +220,7 @@ flowchart LR
   coords[lat / lon / time] --> sun[solar position]
   obs[height + shadow] --> shadow[shadow geolocation]
   exif --> out[analyze_image]
-  out --> fmt[table · json · GeoJSON · STIX 2.1]
+  out --> fmt[table · json · GeoJSON · STIX 2.1 · KML]
 ```
 
 Full writeup: [`docs/DEMOS.md`](docs/DEMOS.md) · architecture: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
