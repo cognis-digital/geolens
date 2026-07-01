@@ -33,6 +33,8 @@ SCENARIOS = [
     "18_seized_folder_report",
     "19_solar_noon_verification",
     "20_export_format_gallery",
+    "21_resection_and_horizon",
+    "22_batch_triage_timeline",
 ]
 
 

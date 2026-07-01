@@ -11,8 +11,19 @@ from . import TOOL_NAME, TOOL_VERSION
 from .core import (
     analyze_image,
     estimate_latitude_from_shadow,
+    extract_exif,
     reverse_search_urls,
     sun_position,
+)
+from .forensics import (
+    batch_triage,
+    build_timeline,
+    fingerprint_consistency,
+    is_peak_visible,
+    resection,
+    reverse_heading,
+    timeline_to_geojson,
+    timezone_crosscheck,
 )
 
 
@@ -90,6 +101,79 @@ def _cmd_reverse(args) -> int:
     return 0
 
 
+def _analyze_folder(folder: str) -> List[dict]:
+    """Analyze every JPEG in a folder into records tagged with their id."""
+    import os
+
+    records: List[dict] = []
+    for name in sorted(os.listdir(folder)):
+        if not name.lower().endswith((".jpg", ".jpeg")):
+            continue
+        path = os.path.join(folder, name)
+        try:
+            with open(path, "rb") as fh:
+                data = fh.read()
+        except OSError:
+            continue
+        rec = analyze_image(data)
+        rec["id"] = name
+        records.append(rec)
+    return records
+
+
+def _cmd_resect(args) -> int:
+    result = resection((args.lm1_lat, args.lm1_lon), args.bearing1,
+                       (args.lm2_lat, args.lm2_lon), args.bearing2)
+    _emit(result, args.format)
+    return 0
+
+
+def _cmd_heading(args) -> int:
+    result = reverse_heading(args.heading, args.px, args.width, args.fov)
+    _emit(result, args.format)
+    return 0
+
+
+def _cmd_horizon(args) -> int:
+    result = is_peak_visible(args.height, args.target_height, args.distance)
+    _emit(result, args.format)
+    return 0 if result["visible"] else 3
+
+
+def _cmd_tzcheck(args) -> int:
+    with open(args.image, "rb") as fh:
+        exif = extract_exif(fh.read())
+    result = timezone_crosscheck(exif)
+    _emit(result, args.format)
+    # exit 3 when we could check and found an inconsistency
+    return 3 if result.get("consistent") is False else 0
+
+
+def _cmd_fingerprint(args) -> int:
+    records = _analyze_folder(args.folder)
+    result = fingerprint_consistency([r["exif"] for r in records])
+    _emit(result, args.format)
+    return 3 if result["flags"] else 0
+
+
+def _cmd_triage(args) -> int:
+    records = _analyze_folder(args.folder)
+    result = batch_triage(records, radius_km=args.radius)
+    _emit(result, args.format)
+    return 0
+
+
+def _cmd_timeline(args) -> int:
+    records = _analyze_folder(args.folder)
+    timeline = build_timeline(records)
+    if args.format == "geojson":
+        print(timeline_to_geojson(timeline))
+    else:
+        timeline.pop("_events_dt", None)
+        _emit(timeline, args.format)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog=TOOL_NAME,
@@ -122,6 +206,61 @@ def build_parser() -> argparse.ArgumentParser:
     pr.add_argument("--url", help="public image URL")
     pr.add_argument("--keyword", action="append", help="keyword (repeatable)")
     pr.set_defaults(func=_cmd_reverse)
+
+    prs = sub.add_parser(
+        "resect", help="estimate observer position from two landmarks + bearings")
+    prs.add_argument("--lm1-lat", type=float, required=True, dest="lm1_lat")
+    prs.add_argument("--lm1-lon", type=float, required=True, dest="lm1_lon")
+    prs.add_argument("--bearing1", type=float, required=True,
+                     help="compass bearing from observer to landmark 1 (deg)")
+    prs.add_argument("--lm2-lat", type=float, required=True, dest="lm2_lat")
+    prs.add_argument("--lm2-lon", type=float, required=True, dest="lm2_lon")
+    prs.add_argument("--bearing2", type=float, required=True,
+                     help="compass bearing from observer to landmark 2 (deg)")
+    prs.set_defaults(func=_cmd_resect)
+
+    ph = sub.add_parser(
+        "heading", help="true bearing to a landmark from its pixel position")
+    ph.add_argument("--heading", type=float, required=True,
+                    help="camera compass heading of frame centre (deg)")
+    ph.add_argument("--px", type=float, required=True,
+                    help="landmark horizontal pixel position")
+    ph.add_argument("--width", type=float, required=True, help="image width (px)")
+    ph.add_argument("--fov", type=float, required=True,
+                    help="horizontal field of view (deg)")
+    ph.set_defaults(func=_cmd_heading)
+
+    phz = sub.add_parser(
+        "horizon", help="can a peak be seen over the horizon from a vantage?")
+    phz.add_argument("--height", type=float, required=True,
+                     help="observer eye height above sea level (m)")
+    phz.add_argument("--target-height", type=float, required=True,
+                     dest="target_height", help="target/peak height (m)")
+    phz.add_argument("--distance", type=float, required=True,
+                     help="claimed distance to the target (km)")
+    phz.set_defaults(func=_cmd_horizon)
+
+    ptz = sub.add_parser(
+        "tzcheck", help="cross-check EXIF local clock vs GPS-UTC / longitude")
+    ptz.add_argument("image", help="path to a JPEG image")
+    ptz.set_defaults(func=_cmd_tzcheck)
+
+    pfp = sub.add_parser(
+        "fingerprint", help="camera/lens fingerprint consistency across a folder")
+    pfp.add_argument("folder", help="folder of JPEG images")
+    pfp.set_defaults(func=_cmd_fingerprint)
+
+    ptr = sub.add_parser(
+        "triage", help="batch triage a folder: geotagged vs scrubbed + clusters")
+    ptr.add_argument("folder", help="folder of JPEG images")
+    ptr.add_argument("--radius", type=float, default=1.0,
+                     help="cluster join radius in km (default: 1.0)")
+    ptr.set_defaults(func=_cmd_triage)
+
+    ptl = sub.add_parser(
+        "timeline", help="build a movement timeline from a folder of images")
+    ptl.add_argument("folder", help="folder of JPEG images")
+    ptl.set_defaults(func=_cmd_timeline)
 
     return p
 
