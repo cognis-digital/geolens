@@ -1,13 +1,13 @@
 # Demos
 
-Twenty runnable scenarios in [`../demos/`](../demos/), each targeting a
+Twenty-two runnable scenarios in [`../demos/`](../demos/), each targeting a
 different audience or failure mode. Every scenario is **offline**: it reads a
 bundled sample image or synthesizes real EXIF bytes in memory, then exercises
 the real `geolens` API — no network, no fabricated output. Each returns 0.
 
 ```bash
 # Windows consoles: set PYTHONUTF8=1 first (cp1252 console)
-python demos/run_all.py                          # all twenty, end to end
+python demos/run_all.py                          # all twenty-two, end to end
 python demos/02_journalist_verification.py       # or just one
 ```
 
@@ -74,6 +74,20 @@ timezone normalization, altitude sign, a printable seized-folder report, a
 latitude→shadow→latitude round-trip proof, and a side-by-side export gallery.
 Several double as regression guards for real fixes (altitude reaching GeoJSON,
 the physical-range clamp on shadow latitudes, input-type guards).
+
+## 21. Geometric geolocation — *no metadata required*
+**Audience:** verification desks and GEOINT analysts.
+Reverse-heading (landmark bearing from its pixel position + lens FOV),
+two-landmark resection (recover the observer position), and the horizon
+falsification test — geolocating and falsifying from the picture alone. See
+[`FORENSICS.md`](FORENSICS.md).
+
+## 22. Batch triage & movement timeline — *one folder, three products*
+**Audience:** law-enforcement / incident-response analysts.
+Split a collected folder into geotagged vs scrubbed, spatially cluster it, build
+a time-ordered movement timeline (with implied speeds) exported as a GeoJSON
+track, and run a camera-fingerprint consistency check that flags a spliced-in,
+different-camera image.
 
 ---
 

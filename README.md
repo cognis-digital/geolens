@@ -148,6 +148,13 @@ Image geolocation toolkit — EXIF, sun-shadow, OCR, reverse-search — without 
 - ✅ Estimate Latitude From Shadow
 - ✅ Reverse Search Urls
 - ✅ Analyze Image
+- ✅ Resection (observer position from two landmark bearings)
+- ✅ Reverse Heading (landmark bearing from pixel position + FOV)
+- ✅ Horizon / peak-visibility falsification test
+- ✅ Timezone cross-check (EXIF local clock vs GPS-UTC vs longitude)
+- ✅ Camera fingerprint consistency (tamper/splice signals)
+- ✅ Batch triage + spatial clustering of an image set
+- ✅ Movement timeline → GeoJSON track exporter
 - ✅ Runs on Linux/macOS/Windows · Docker · devcontainer
 - ✅ Ports in Python, JavaScript, Go, and Rust (`ports/`)
 
@@ -211,6 +218,8 @@ python demos/02_journalist_verification.py    # or just one
 | 3 | [`03_le_batch_triage.py`](demos/03_le_batch_triage.py) | Law enforcement / IR | Mixed seized folder: who is geotagged vs scrubbed, + a STIX bundle |
 | 4 | [`04_researcher_shadow_geolocation.py`](demos/04_researcher_shadow_geolocation.py) | Researchers | Recover latitude from a stick and its shadow (the "shadow stick") |
 | 5 | [`05_geojson_stix_export.py`](demos/05_geojson_stix_export.py) | Platform / SOC engineers | One fix → GeoJSON (maps) + STIX 2.1 (TIP), graceful with no GPS |
+| 21 | [`21_resection_and_horizon.py`](demos/21_resection_and_horizon.py) | Verification / GEOINT | Metadata-free geolocation: reverse-heading, two-landmark resection, horizon falsification |
+| 22 | [`22_batch_triage_timeline.py`](demos/22_batch_triage_timeline.py) | LE / IR analysts | Folder → clusters + movement timeline (GeoJSON track) + camera-fingerprint tamper flag |
 
 ```mermaid
 flowchart LR
@@ -221,7 +230,7 @@ flowchart LR
   out --> fmt[table · json · GeoJSON · STIX 2.1]
 ```
 
-Full writeup: [`docs/DEMOS.md`](docs/DEMOS.md) · architecture: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+Full writeup: [`docs/DEMOS.md`](docs/DEMOS.md) · architecture: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · forensics & analytical geolocation: [`docs/FORENSICS.md`](docs/FORENSICS.md).
 
 <div align="right"><a href="#top">↑ back to top</a></div>
 

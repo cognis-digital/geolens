@@ -140,6 +140,74 @@ class TestReverseCommand(unittest.TestCase):
         self.assertIn("google_text", json.loads(out))
 
 
+class TestForensicsCommands(unittest.TestCase):
+    def _folder(self):
+        import datetime as _dt
+
+        d = tempfile.mkdtemp()
+        imgs = {
+            "a.jpg": _common.make_exif_jpeg(
+                48.8584, 2.2945,
+                when=_dt.datetime(2026, 6, 21, 10, tzinfo=_dt.timezone.utc)),
+            "b.jpg": _common.make_exif_jpeg(
+                48.8600, 2.2960,
+                when=_dt.datetime(2026, 6, 21, 11, tzinfo=_dt.timezone.utc)),
+            "scrub.jpg": b"\xff\xd8\xff\xd9",
+        }
+        for name, data in imgs.items():
+            with open(os.path.join(d, name), "wb") as fh:
+                fh.write(data)
+        return d
+
+    def test_resect_recovers_position(self):
+        rc, out, _ = _run(["--format", "json", "resect",
+                           "--lm1-lat", "48.8584", "--lm1-lon", "2.2945",
+                           "--bearing1", "356.45",
+                           "--lm2-lat", "48.8606", "--lm2-lon", "2.3376",
+                           "--bearing2", "22.2"])
+        self.assertEqual(rc, 0)
+        doc = json.loads(out)
+        self.assertIn("latitude", doc)
+        self.assertIn("residual_km", doc)
+
+    def test_heading_center(self):
+        rc, out, _ = _run(["--format", "json", "heading", "--heading", "90",
+                           "--px", "1920", "--width", "3840", "--fov", "70"])
+        self.assertEqual(rc, 0)
+        self.assertAlmostEqual(json.loads(out)["landmark_bearing_deg"], 90.0, places=2)
+
+    def test_horizon_visible_exit0(self):
+        rc, out, _ = _run(["--format", "json", "horizon", "--height", "2",
+                           "--target-height", "4808", "--distance", "200"])
+        self.assertEqual(rc, 0)
+        self.assertTrue(json.loads(out)["visible"])
+
+    def test_horizon_not_visible_exit3(self):
+        rc, _, _ = _run(["horizon", "--height", "2",
+                         "--target-height", "100", "--distance", "500"])
+        self.assertEqual(rc, 3)
+
+    def test_triage_folder(self):
+        d = self._folder()
+        rc, out, _ = _run(["--format", "json", "triage", d])
+        self.assertEqual(rc, 0)
+        doc = json.loads(out)
+        self.assertEqual(doc["geotagged"], 2)
+        self.assertEqual(doc["scrubbed"], 1)
+
+    def test_timeline_geojson(self):
+        d = self._folder()
+        rc, out, _ = _run(["--format", "geojson", "timeline", d])
+        self.assertEqual(rc, 0)
+        self.assertEqual(json.loads(out)["type"], "FeatureCollection")
+
+    def test_fingerprint_folder(self):
+        d = self._folder()
+        rc, out, _ = _run(["--format", "json", "fingerprint", d])
+        self.assertIn(rc, (0, 3))
+        self.assertIn("flags", json.loads(out))
+
+
 class TestParserErrors(unittest.TestCase):
     def test_no_subcommand_exits(self):
         with self.assertRaises(SystemExit):
