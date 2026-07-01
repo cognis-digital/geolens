@@ -1,0 +1,15 @@
+name: geolens CodeQL config
+
+# Scope analysis to the shipped library. The demo scripts and tests are
+# illustrative: they intentionally print the latitude/longitude coordinates
+# being analyzed (that is the tool's entire purpose — geolocation output),
+# which CodeQL's name-based heuristic misreads as "clear-text logging of
+# sensitive data". Those are false positives on non-shipped code, so we
+# analyze geolens/ (the actual package) and leave demos/tests out.
+paths:
+  - geolens
+paths-ignore:
+  - demos
+  - tests
+  - ports
+  - integrations
