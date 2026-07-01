@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "cognis-geolens"
-version = "0.1.1"
+version = "0.2.6"
 description = "Image geolocation toolkit — EXIF, sun-shadow, OCR, reverse-search"
 authors = [{name = "Cognis Digital", email = "suite@cognis.digital"}]
 license = {text = "LicenseRef-COCL-1.0"}

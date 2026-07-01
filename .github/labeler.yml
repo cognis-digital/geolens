@@ -1,4 +1,15 @@
-docs: ['**/*.md']
-tests: ['tests/**']
-ci: ['.github/**']
-ports: ['ports/**']
+# actions/labeler@v5 configuration.
+# v5 replaced the flat glob lists used by v4 with an explicit match structure
+# (changed-files / any-glob-to-any-file). Keep this in sync with .github/workflows/label.yml.
+docs:
+  - changed-files:
+      - any-glob-to-any-file: '**/*.md'
+tests:
+  - changed-files:
+      - any-glob-to-any-file: 'tests/**'
+ci:
+  - changed-files:
+      - any-glob-to-any-file: '.github/**'
+ports:
+  - changed-files:
+      - any-glob-to-any-file: 'ports/**'

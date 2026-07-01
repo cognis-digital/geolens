@@ -32,16 +32,32 @@ def _seed(result: dict) -> str:
     return json.dumps({"gps": gps, "p": _props(result)}, sort_keys=True, default=str)
 
 
+def _altitude(gps: dict):
+    """Read altitude regardless of key spelling.
+
+    ``core.gps_from_exif`` emits ``altitude_m``; older/hand-built records used
+    ``altitude``. Accept either so real EXIF altitude actually reaches output.
+    """
+    if "altitude_m" in gps:
+        return gps["altitude_m"]
+    if "altitude" in gps:
+        return gps["altitude"]
+    return None
+
+
 def to_geojson(result: dict) -> str:
     feats = []
     gps = result.get("gps")
     if gps and gps.get("latitude") is not None and gps.get("longitude") is not None:
+        alt = _altitude(gps)
+        coords = [gps["longitude"], gps["latitude"]]  # [lon,lat]
+        if alt is not None:
+            coords.append(alt)  # GeoJSON position may carry elevation
         feats.append({
             "type": "Feature",
-            "geometry": {"type": "Point",
-                         "coordinates": [gps["longitude"], gps["latitude"]]},  # [lon,lat]
+            "geometry": {"type": "Point", "coordinates": coords},
             "properties": {"source": "geolens:exif-gps", **_props(result),
-                           **({"altitude": gps["altitude"]} if "altitude" in gps else {})},
+                           **({"altitude": alt} if alt is not None else {})},
         })
     return json.dumps({"type": "FeatureCollection", "features": feats}, indent=2)
 

@@ -19,8 +19,10 @@ def test_geojson_point_lonlat():
     doc = json.loads(intel.to_geojson(_WITH_GPS))
     assert doc["type"] == "FeatureCollection"
     assert len(doc["features"]) == 1
-    assert doc["features"][0]["geometry"]["coordinates"] == [2.2945, 48.8584]  # [lon,lat]
+    # [lon, lat, alt] — altitude carried through when present (see _altitude)
+    assert doc["features"][0]["geometry"]["coordinates"] == [2.2945, 48.8584, 33.0]
     assert doc["features"][0]["properties"]["make"] == "Canon"
+    assert doc["features"][0]["properties"]["altitude"] == 33.0
 
 
 def test_geojson_empty_without_gps():

@@ -16,8 +16,28 @@ from __future__ import annotations
 
 import datetime as _dt
 import math
+import os as _os
 import struct
 from typing import Any, Dict, List, Optional, Tuple
+
+TOOL_NAME = "geolens"
+
+
+def _read_version() -> str:
+    """Single source of truth: the repo-root ``VERSION`` file, if present."""
+    here = _os.path.dirname(_os.path.abspath(__file__))
+    vfile = _os.path.join(_os.path.dirname(here), "VERSION")
+    try:
+        with open(vfile, encoding="utf-8") as fh:
+            v = fh.read().strip()
+            if v:
+                return v
+    except OSError:
+        pass
+    return "0.0.0"
+
+
+TOOL_VERSION = _read_version()
 
 # ---------------------------------------------------------------------------
 # EXIF / TIFF tag parsing
@@ -131,7 +151,17 @@ def _parse_ifd(buf: bytes, endian: str, offset: int) -> Tuple[Dict[int, Any], Li
 
 
 def extract_exif(image_bytes: bytes) -> Dict[str, Any]:
-    """Return a dict of decoded EXIF/GPS tags, or ``{}`` if none present."""
+    """Return a dict of decoded EXIF/GPS tags, or ``{}`` if none present.
+
+    :raises TypeError: if ``image_bytes`` is not bytes-like.
+    """
+    if not isinstance(image_bytes, (bytes, bytearray, memoryview)):
+        raise TypeError(
+            f"image_bytes must be bytes-like, got {type(image_bytes).__name__}"
+        )
+    image_bytes = bytes(image_bytes)
+    if len(image_bytes) < 2:
+        return {}
     seg = _find_exif_segment(image_bytes)
     if seg is None:
         return {}
@@ -219,7 +249,23 @@ def sun_position(lat: float, lon: float, when: _dt.datetime) -> Dict[str, float]
     """NOAA solar position: returns azimuth & elevation (degrees).
 
     ``when`` may be naive (treated as UTC) or timezone-aware.
+
+    :raises TypeError: if ``when`` is not a ``datetime``.
+    :raises ValueError: if ``lat``/``lon`` are non-finite or out of range.
     """
+    if not isinstance(when, _dt.datetime):
+        raise TypeError(f"when must be a datetime, got {type(when).__name__}")
+    try:
+        lat = float(lat)
+        lon = float(lon)
+    except (TypeError, ValueError):
+        raise ValueError("lat and lon must be numeric")
+    if not (math.isfinite(lat) and math.isfinite(lon)):
+        raise ValueError("lat and lon must be finite numbers")
+    if not (-90.0 <= lat <= 90.0):
+        raise ValueError(f"lat {lat} out of range [-90, 90]")
+    if not (-180.0 <= lon <= 180.0):
+        raise ValueError(f"lon {lon} out of range [-180, 180]")
     if when.tzinfo is None:
         when = when.replace(tzinfo=_dt.timezone.utc)
     jd = _julian_day(when)
@@ -321,17 +367,33 @@ def estimate_latitude_from_shadow(
     ``latitude = declination ± (90 - h)``. Both candidate latitudes are
     returned (the shadow direction disambiguates north vs. south).
     """
+    if not isinstance(when, _dt.datetime):
+        raise TypeError(f"when must be a datetime, got {type(when).__name__}")
+    try:
+        object_height = float(object_height)
+        shadow_length = float(shadow_length)
+    except (TypeError, ValueError):
+        raise ValueError("object_height and shadow_length must be numeric")
+    if not (math.isfinite(object_height) and math.isfinite(shadow_length)):
+        raise ValueError("object_height and shadow_length must be finite")
     if shadow_length <= 0 or object_height <= 0:
         raise ValueError("object_height and shadow_length must be positive")
     elevation = math.degrees(math.atan2(object_height, shadow_length))
     # declination changes slowly; evaluate at the given instant.
     decl = sun_position(0.0, 0.0, when)["declination_deg"]
     zenith = 90.0 - elevation
+    north = decl + zenith
+    south = decl - zenith
+    # A recovered latitude outside [-90, 90] is physically impossible: at very
+    # low sun the geometry pushes a candidate off the pole. Flag it and clamp
+    # the reported value so downstream mapping code never sees a bad coordinate.
+    out_of_range = not (-90.0 <= north <= 90.0) or not (-90.0 <= south <= 90.0)
     return {
         "sun_elevation_deg": round(elevation, 3),
         "declination_deg": round(decl, 3),
-        "latitude_candidate_north": round(decl + zenith, 3),
-        "latitude_candidate_south": round(decl - zenith, 3),
+        "latitude_candidate_north": round(max(-90.0, min(90.0, north)), 3),
+        "latitude_candidate_south": round(max(-90.0, min(90.0, south)), 3),
+        "candidate_out_of_range": out_of_range,
         "assume_local_noon": assume_local_noon,
     }
 
